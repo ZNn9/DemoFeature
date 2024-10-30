@@ -7,6 +7,7 @@ using Systems.Account.Model;
 using Systems.SaveLoad.Manager;
 using Systems.Account.Manager;
 using Systems.SaveLoad.Service;
+using Systems.Scriptable.Events;
 
 // Chưa sử lý liên kết
 // Chưa sử lý đồng bộ sau khi liên kết
@@ -15,11 +16,7 @@ namespace Systems.Account.Service
     public class AccountService
     {
         // Action
-        public void StartGame()
-        {
-            SetAttributeAccount();
-            // Check Version data player could
-        }
+
         // SignIn ZONE
 
         // Logout ZONE
@@ -27,26 +24,26 @@ namespace Systems.Account.Service
         {
             //Not really
             if (SignInResult.AccountType == AccountType.NotSignIn) return;
-            PlayerDataManager.Instance.hero = null;
             if (SignInResult.AccountType == AccountType.Player)
                 AuthenticationService.Instance.SignOut();
             SignInResult.AccountType = AccountType.NotSignIn;
             SignInResult.IdPlayer = string.Empty;
-
+            Observer.Instance.Notify("onLogoutAccount");
         }
         // Delete ZONE
         public void DeleteAccount()
         {
             if (FindPlayerId() == string.Empty) return;
+            Observer.Instance.Notify("onDeleteAccount");
             SignInResult.AccountType = AccountType.NotSignIn;
             SignInResult.IdPlayer = string.Empty;
-            if (FindPlayerId() == "AnonymousAccount")
-            {
-                SaveLoadManager.Instance.saveLoadLocalService.DeleteFolder("AnonymousAccount");
-                return;
-            }
-            // Not done
-            SaveLoadManager.Instance.saveLoadLocalService.DeleteFolder(FindPlayerId());
+            // if (FindPlayerId() == "AnonymousAccount")
+            // {
+            //     SaveLoadManager.Instance.saveLoadLocalService.DeleteFolder("AnonymousAccount");
+            //     return;
+            // }
+            // // Not done
+            // SaveLoadManager.Instance.saveLoadLocalService.DeleteFolder(FindPlayerId());
             //Delete account in cloud (Not done)
         }
         // Find Zone

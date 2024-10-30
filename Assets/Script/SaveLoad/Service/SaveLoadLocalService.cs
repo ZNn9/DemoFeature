@@ -4,18 +4,16 @@ using System.IO;
 using System.Threading.Tasks;
 using Systems.Account.Enum;
 using Systems.Account.Model;
-using Systems.Multiplay.Manager;
+using Systems.Multiplayer.Manager;
 using Systems.SaveLoad.Interface;
 using Systems.SaveLoad.Manager;
 using Systems.SaveLoad.Model;
+using UnityEngine;
 
 namespace Systems.SaveLoad.Service
 {
     public class SaveLoadLocalService
     {
-        public Dictionary<string, Func<Task>> saveActions;
-
-        public List<string> listNameFlailedSaves = new List<string>();
         public TrackableService trackableService = new TrackableService();
         ISerializer serializer = new JsonSerializerService();
         private string dataPath;
@@ -34,7 +32,7 @@ namespace Systems.SaveLoad.Service
         }
         public string GetPathFolder(string folderName)
         {
-            return Path.Combine(dataPath, string.Concat(folderName));
+            return Path.Combine(dataPath, folderName);
         }
         public string GetPathToFile(string fileName)
         {
@@ -46,16 +44,22 @@ namespace Systems.SaveLoad.Service
         }
         public void CreateFolder(string folderName)
         {
-            if (!Directory.Exists(string.Concat(dataPath, folderName)))
+            string path = Path.Combine(dataPath, folderName);
+            if (!Directory.Exists(path))
+                {
+                Directory.CreateDirectory(path);
+                // Debug.Log($"Folder created at: {path}");
+            }
+            else
             {
-                Directory.CreateDirectory(string.Concat(dataPath, folderName));
-                return;
+                // Debug.Log($"Folder already exists at: {path}");
             }
         }
         //Save ZONE
         public async Task SaveAsync<T>(string fileName, T data, bool overwrite = true)
         {
             string fileLocation = FindFileSave(fileName, overwrite);
+            Debug.Log($"file fileLocation at: {fileLocation}");
             if (fileLocation == string.Empty) return;
             string jsonData = serializer.Serialize(data);
             await File.WriteAllTextAsync(fileLocation, jsonData);
@@ -63,6 +67,7 @@ namespace Systems.SaveLoad.Service
         public async Task SaveAsync<T>(string folderName, string fileName, T data, bool overwrite = true)
         {
             string fileLocation = FindFileSave(folderName, fileName, overwrite);
+            Debug.Log($"file fileLocation at: {fileLocation}");
             if (fileLocation == string.Empty) return;
             string jsonData = serializer.Serialize(data);
             await File.WriteAllTextAsync(fileLocation, jsonData);
@@ -70,97 +75,24 @@ namespace Systems.SaveLoad.Service
         private string FindFileSave(string fileName, bool overwrite = true)
         {
             string fileLocation = GetPathToFile(fileName);
-            if (overwrite && File.Exists(fileLocation)) return fileLocation;
-            if (!overwrite && !File.Exists(fileLocation)) return fileLocation;
+            if (overwrite)
+                return fileLocation;
+            if (!overwrite && !File.Exists(fileLocation))
+                return fileLocation;
             return string.Empty;
         }
         private string FindFileSave(string folderName, string fileName, bool overwrite = true)
         {
             CreateFolder(folderName);
             string fileLocation = GetPathToFile(folderName, fileName);
-            if (overwrite && File.Exists(fileLocation)) return fileLocation;
-            if (!overwrite && !File.Exists(fileLocation)) return fileLocation;
+            if (overwrite)
+                return fileLocation;
+            if (!overwrite && !File.Exists(fileLocation))
+                return fileLocation;
             return string.Empty;
         }
         // Save Action ZONE
-        public async Task SavePlayerData()
-        {
-            saveActions = new Dictionary<string, Func<Task>>
-            {
-                { "hero", async () => await SaveHeroData() },
-                // Thêm các hành động khác nếu cần
-                // { "setting", async () => await SaveSettingData() }
-            };
-            var changes = trackableService.GetAllChanges();
 
-            foreach (var change in changes)
-            {
-                if (change.Value == true && saveActions.TryGetValue(change.Key, out var saveAction))
-                {
-                    bool saveSuccess = false;
-
-                    // Thử lưu và ghi lại trạng thái thất bại nếu lưu không thành công
-                    try
-                    {
-                        await saveAction();
-                        saveSuccess = true; // Lưu thành công
-                    }
-                    catch (Exception)
-                    {
-
-                    }
-
-                    if (!saveSuccess)
-                    {
-                        listNameFlailedSaves.Add(change.Key); // Thêm vào danh sách thất bại
-                    }
-                }
-            }
-            trackableService.ResetChanges();
-            // Thử lưu lại các đối tượng không lưu được
-            await RetryFailedSaves();
-        }
-
-        private async Task SaveHeroData()
-        {
-            bool isLoggedIn = SignInResult.AccountType == AccountType.Player;
-            await SaveAsync<HeroManager>(SignInResult.IdPlayer, "hero", PlayerDataManager.Instance.hero);
-            PlayerDataManager.Instance.IsModified = false;
-            try
-            {
-                if (isLoggedIn && MultiplayerManager.Instance.isNetworkAvailable)
-                {
-                    // Xử lý lưu dữ liệu lên cloud
-                }
-            }
-            catch (Exception)
-            {
-
-            }
-        }
-        private async Task RetryFailedSaves()
-        {
-            foreach (var key in listNameFlailedSaves.ToArray())
-            {
-                bool saveSuccess = false;
-
-                try
-                {
-                    var saveAction = saveActions[key];
-                    await saveAction();
-                    saveSuccess = true;
-                }
-                catch (Exception)
-                {
-
-                }
-
-                if (saveSuccess)
-                {
-                    listNameFlailedSaves.Remove(key);
-                }
-            }
-        }
         // Load ZONE
         public async Task<T> LoadAsync<T>(string fileName)
         {
@@ -171,7 +103,7 @@ namespace Systems.SaveLoad.Service
                 return default;
             }
             string jsonData = await File.ReadAllTextAsync(fileLocation);
-            return serializer.Deserialize<T>(File.ReadAllText(jsonData));
+            return serializer.Deserialize<T>(jsonData);
         }
         public async Task<T> LoadAsync<T>(string folderName, string fileName)
         {
@@ -182,7 +114,7 @@ namespace Systems.SaveLoad.Service
                 return default;
             }
             string jsonData = await File.ReadAllTextAsync(fileLocation);
-            return serializer.Deserialize<T>(File.ReadAllText(jsonData));
+            return serializer.Deserialize<T>(jsonData);
         }
         public void DeleteFile(string fileName)
         {

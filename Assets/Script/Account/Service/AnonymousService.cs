@@ -6,21 +6,23 @@ using Systems.Account.Model;
 using Systems.SaveLoad.Manager;
 using Systems.SaveLoad.Model;
 using Systems.SaveLoad.Service;
+using Systems.Scriptable.Events;
 
 namespace Systems.Account.Service
 {
     public class AnonymousAccount
     {
         public async Task SignInAnonymous()
-        {
+    {
+            SignInResult.AccountType = AccountType.Anonymous;
+            SignInResult.IdPlayer = "AnonymousAccount";
             if (!SaveLoadManager.Instance.saveLoadLocalService.CheckAnonymousFolderExists())
             {
                 AccountData playerData = new AccountData();
-                playerData.idPlayer = "AnonymousAccount";
-                await SaveLoadManager.Instance.saveLoadLocalService.SaveAsync<AccountData>(playerData.idPlayer, "AccountData" ,playerData);
+                await SaveLoadManager.Instance.SaveData(playerData);
             }
-            SignInResult.AccountType = AccountType.Anonymous;
-            SignInResult.IdPlayer = "AnonymousAccount";
+
+            Observer.Instance.Notify("onLoginAccount");
         }
     }
 }

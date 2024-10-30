@@ -1,5 +1,8 @@
+using System;
 using System.Collections.Generic;
+using System.Linq.Expressions;
 using Systems.SaveLoad.Model;
+using Unity.VisualScripting;
 
 namespace Systems.SaveLoad.Service
 {
@@ -52,10 +55,17 @@ namespace Systems.SaveLoad.Service
 
         public void ResetChanges()
         {
-            foreach (var key in trackableObject.IsModified.Keys)
+            // Tạo danh sách các khóa trước khi duyệt qua
+            var keys = new List<string>(trackableObject.IsModified.Keys);
+            foreach (var key in keys)
             {
-                trackableObject.IsModified[key] = false;
+                try
+                {
+                    trackableObject.IsModified[key] = false;
+                }
+                catch{}
             }
         }
+
     }
 }

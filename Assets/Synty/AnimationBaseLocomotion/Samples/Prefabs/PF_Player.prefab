@@ -10,10 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7790563198288032598}
   - component: {fileID: 4901148335718691314}
-  - component: {fileID: 4622580763714357971}
   m_Layer: 0
   m_Name: PF_Player
-  m_TagString: PlayerRespawn
+  m_TagString: PlayerHero
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -49,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 3197621358
+  GlobalObjectIdHash: 1233977115
   InScenePlacedSourceGlobalObjectIdHash: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
@@ -58,33 +57,6 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
---- !u!114 &4622580763714357971
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6064801525321721345}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: aa090b079dfd0084bb192664be8344c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerData:
-    position: {x: 0, y: 0, z: 0}
-    rotation: {x: 0, y: 0, z: 0, w: 0}
-    name: 
-    sex: 0
-    coin: 0
-    level: 0
-    experience: 0
-    baseHealth: 200
-    maxShield: 200
-    attack: 20
-    defense: 20
-    accuracy: 10
-    luck: 10
-    evasion: 5
 --- !u!1 &6066353061473038840
 GameObject:
   m_ObjectHideFlags: 0

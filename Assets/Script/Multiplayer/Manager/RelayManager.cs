@@ -11,7 +11,7 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
 
-namespace Systems.Multiplay.Manager
+namespace Systems.Multiplayer.Manager
 {
     public class RelayManager : MonoBehaviour
     {

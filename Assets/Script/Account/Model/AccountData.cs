@@ -6,8 +6,8 @@ namespace Systems.Account.Model
     public class AccountData
     {
         public string idPlayer = "AnonymousAccount";
-        public string version;
         public string name;
         public bool sex;
+        public string version;
     }
 }

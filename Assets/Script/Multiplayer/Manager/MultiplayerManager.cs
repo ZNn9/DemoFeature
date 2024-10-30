@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Systems.Scriptable.Events;
 using TMPro;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
@@ -9,13 +10,10 @@ using Unity.Services.Core;
 using Unity.Services.Multiplay;
 using UnityEngine;
 
-namespace Systems.Multiplay.Manager
+namespace Systems.Multiplayer.Manager
 {
     public class MultiplayerManager : PersistentSingleton<MultiplayerManager>
     {
-        public event Action OnNetworkDisable;
-        public event Action OnNetworkAvailable;
-        public event Action OnNetworkRestored;
         private bool isOfflineSavePending = false;
         public bool isNetworkAvailable = true; 
 
@@ -66,13 +64,12 @@ namespace Systems.Multiplay.Manager
             isNetworkAvailable = IsNetworkAvailable();
             if (isNetworkAvailable && isOfflineSavePending)
             {
-                OnNetworkRestored?.Invoke();
-                OnNetworkAvailable?.Invoke();
+                Observer.Instance.Notify("onNetworkAvailable");
                 isOfflineSavePending = false; // Đặt lại sau khi đã lưu thành công
             }
             else if (!isNetworkAvailable)
             {
-                OnNetworkDisable?.Invoke();
+                Observer.Instance.Notify("onNetworkDisable");
                 isOfflineSavePending = true;
             }
             if (Application.platform == RuntimePlatform.LinuxServer)

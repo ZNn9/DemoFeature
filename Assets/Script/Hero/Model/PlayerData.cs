@@ -1,14 +1,14 @@
 using System;
+using System.Threading.Tasks;
 using Systems.SaveLoad.Interface;
 
 using UnityEngine;
 
-namespace Systems.SaveLoad.Model
+namespace Systems.Hero.Model
 {
     [System.Serializable]
-    public class PlayerData : ISaveable
+    public class PlayerData
     {
-        [field: SerializeField] public Guid Id { get; set; }
         public Vector3 position;
         public Quaternion rotation;
         public long coin = 0;
@@ -18,6 +18,7 @@ namespace Systems.SaveLoad.Model
         public int maxShield = 200;
         public int attack = 20;
         public int defense = 20;
+        public float speed = 5;
         public int accuracy = 10;
         public int luck = 10;
         public int evasion = 5;
