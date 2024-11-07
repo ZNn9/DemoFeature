@@ -69,10 +69,21 @@ namespace Systems.Account.Service
             return AccountType.NotSignIn;
         }
         // Set ZONE
-        public void SetAttributeAccount(bool isManagerByFolder = true)
+        public async void SetAttributeAccount(bool isManagerByFolder = true)
         {
             SignInResult.AccountType = CheckAccountType(isManagerByFolder);
             SignInResult.IdPlayer = FindPlayerId();
+            if (SignInResult.AccountType == AccountType.Anonymous)
+            {
+                AnonymousService anonymousService = new AnonymousService();
+                await anonymousService.SignInAnonymous();
+                return;
+            }
+            if (SignInResult.AccountType == AccountType.Anonymous)
+            {
+                Observer.Instance.Notify("onLoginAccount");
+                return;
+            }
         }
     }
 }

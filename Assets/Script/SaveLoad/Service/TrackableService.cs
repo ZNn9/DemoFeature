@@ -55,7 +55,6 @@ namespace Systems.SaveLoad.Service
 
         public void ResetChanges()
         {
-            // Tạo danh sách các khóa trước khi duyệt qua
             var keys = new List<string>(trackableObject.IsModified.Keys);
             foreach (var key in keys)
             {

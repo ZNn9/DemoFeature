@@ -23,7 +23,7 @@ namespace Systems.Account.Manager
     public class AccountManager : PersistentSingleton<AccountManager>
     {
         public AccountService accountService = new AccountService();
-        public AnonymousAccount anonymousAccount = new AnonymousAccount();
+        public AnonymousService anonymousAccount = new AnonymousService();
         public AccountData accountData;
         public bool IsModified = false;
         protected override void Awake()

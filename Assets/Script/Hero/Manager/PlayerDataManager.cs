@@ -1,4 +1,5 @@
 
+using System.Collections;
 using Systems.Hero.Model;
 using Systems.SaveLoad.Manager;
 using Systems.Scriptable.Events;
@@ -11,7 +12,7 @@ namespace Systems.Hero.Manager
         public bool isModified = false;
         private Vector3 lastPosition;
 
-        public GameObject playerHero; // Tham chiếu tới Hero của người chơi
+        [SerializeField] public GameObject playerHero; // Tham chiếu tới Hero của người chơi
 
         protected override void Awake()
         {
@@ -24,16 +25,16 @@ namespace Systems.Hero.Manager
 
         private void Update()
         {
-            if (playerData != null && playerHero != null)
-            {
-                Vector3 currentPosition = playerHero.transform.position;
-                Quaternion currentRotation = playerHero.transform.rotation;
-                if (currentPosition != lastPosition)
-                {
-                    lastPosition = currentPosition;
-                    UpdatePlayerPositionRotation(currentPosition, currentRotation);
-                }
-            }
+            // if (playerData != null && playerHero != null && GameManager.Instance.isPlayingInMap)
+            // {
+            //     Vector3 currentPosition = playerHero.transform.position;
+            //     Quaternion currentRotation = playerHero.transform.rotation;
+            //     if (currentPosition != lastPosition)
+            //     {
+            //         lastPosition = currentPosition;
+            //         UpdatePlayerPositionRotation(currentPosition, currentRotation);
+            //     }
+            // }
         }
 
         private void UpdatePlayerPositionRotation(Vector3 position, Quaternion rotation)
@@ -54,15 +55,39 @@ namespace Systems.Hero.Manager
             Observer.Instance.RemoveListener("onPlayGame", OnPlayGame);
             Observer.Instance.RemoveListener("onLeaveGame", OnLeaveGame);
         }
+
         private void OnPlayGame(object[] obj)
         {
-            // playerHero = GameObject.FindWithTag("PlayerHero");
-            Debug.Log($"PlayerHero: {playerHero}");
-            playerHero.transform.position = playerData.position;
-            playerHero.transform.rotation = playerData.rotation;
-            if (playerHero != null)
+            // playerHero = GameObject.FindWithTag("PlayerHero");            
+            // Set position and rotation first
+            StartCoroutine(ActivatePlayerHeroWithDelay());
+        }
+
+        private IEnumerator ActivatePlayerHeroWithDelay()
+        {
+            // Đợi 3 giây
+            yield return new WaitForSeconds(2f);
+
+            // // Đặt vị trí và xoay của playerHero
+            // Debug.Log($"PlayerDataManager: {playerData.position}");
+
+            // playerHero.transform.position = playerData.position;
+            // playerHero.transform.rotation = playerData.rotation;
+
+            // // Kích hoạt GameObject sau khi đã đặt vị trí và xoay
+            // if (playerHero != null)
+            // {
+            //     playerHero.SetActive(true);
+            // }
+            // Giả sử bạn đã load dữ liệu vào `playerData`
+            if (playerData != null && playerHero != null)
             {
-                playerHero.SetActive(true); // Bật Hero khi bắt đầu trò chơi
+                // Cập nhật vị trí từ dữ liệu đã lưu
+                playerHero.transform.position = playerData.position;
+                playerHero.transform.rotation = playerData.rotation;
+
+                // Bật GameObject sau khi cập nhật vị trí
+                playerHero.SetActive(true);
             }
         }
 

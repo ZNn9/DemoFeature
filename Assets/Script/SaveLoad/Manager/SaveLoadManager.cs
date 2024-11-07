@@ -14,6 +14,7 @@ using Systems.Scriptable.Events;
 using Systems.Hero.Manager;
 using Systems.Hero.Model;
 using Unity.VisualScripting;
+using JetBrains.Annotations;
 
 namespace Systems.SaveLoad.Manager
 {
@@ -66,6 +67,10 @@ namespace Systems.SaveLoad.Manager
         }
         private async void OnApplicationQuit()
         {
+            PlayerDataManager.Instance.playerData.position = PlayerDataManager.Instance.playerHero.transform.position;
+            PlayerDataManager.Instance.playerData.rotation = PlayerDataManager.Instance.playerHero.transform.rotation;
+            saveLoadLocalService.trackableService.UpdateChange("playerData", true);
+            Debug.Log($"Save: {PlayerDataManager.Instance.playerData.position}");
             await SaveData();
         }
         private async void OnLogin(object[] obj)
@@ -82,6 +87,7 @@ namespace Systems.SaveLoad.Manager
             {
                 AccountManager.Instance.accountData = await saveLoadLocalService.LoadAsync<AccountData>(SignInResult.IdPlayer, "account");
                 PlayerDataManager.Instance.playerData = await saveLoadLocalService.LoadAsync<PlayerData>(SignInResult.IdPlayer, "playerData");
+                Debug.Log($"SaveLoadManager :{PlayerDataManager.Instance.playerData.position}");
                 return;
             }
             // Check đối chiếu kiểm tra version save mới nhất giữa Local và Cloud
@@ -121,7 +127,7 @@ namespace Systems.SaveLoad.Manager
         public async Task SaveData(AccountData newAccountData)
         {
             PlayerData newPlayerData = new PlayerData();
-            
+
             // Lưu dữ liệu tài khoản và dữ liệu người chơi
             await saveLoadLocalService.SaveAsync<AccountData>(SignInResult.IdPlayer, "account", newAccountData);
             await saveLoadLocalService.SaveAsync<PlayerData>(SignInResult.IdPlayer, "playerData", newPlayerData);
@@ -134,7 +140,7 @@ namespace Systems.SaveLoad.Manager
             await RetryFailedSaves();
             var changes = saveLoadLocalService.trackableService.GetAllChanges();
 
-            foreach (var change in changes )
+            foreach (var change in changes)
             {
                 if (change.Value == true && saveActions.TryGetValue(change.Key, out var saveAction))
                 {
@@ -184,7 +190,9 @@ namespace Systems.SaveLoad.Manager
         private async Task SavePlayerData()
         {
             bool isLoggedIn = SignInResult.AccountType == AccountType.Player;
+            
             await saveLoadLocalService.SaveAsync<PlayerData>(SignInResult.IdPlayer, "playerData", PlayerDataManager.Instance.playerData);
+
             PlayerDataManager.Instance.isModified = false;
             try
             {

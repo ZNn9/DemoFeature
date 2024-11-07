@@ -10,10 +10,10 @@ using Systems.Scriptable.Events;
 
 namespace Systems.Account.Service
 {
-    public class AnonymousAccount
+    public class AnonymousService
     {
         public async Task SignInAnonymous()
-    {
+        {
             SignInResult.AccountType = AccountType.Anonymous;
             SignInResult.IdPlayer = "AnonymousAccount";
             if (!SaveLoadManager.Instance.saveLoadLocalService.CheckAnonymousFolderExists())
