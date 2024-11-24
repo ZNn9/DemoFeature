@@ -8,12 +8,13 @@ namespace Systems.Hero.Manager
 {
     public class PlayerDataManager : PersistentSingleton<PlayerDataManager>
     {
+
         public PlayerData playerData;
         public bool isModified = false;
         private Vector3 lastPosition;
 
-        [SerializeField] public GameObject playerHero; // Tham chiếu tới Hero của người chơi
-
+        [SerializeField] public GameObject prefabPlayerHero; // Tham chiếu tới Hero của người chơi
+        public GameObject playerHero;
         protected override void Awake()
         {
             base.Awake();
@@ -25,16 +26,16 @@ namespace Systems.Hero.Manager
 
         private void Update()
         {
-            // if (playerData != null && playerHero != null && GameManager.Instance.isPlayingInMap)
-            // {
-            //     Vector3 currentPosition = playerHero.transform.position;
-            //     Quaternion currentRotation = playerHero.transform.rotation;
-            //     if (currentPosition != lastPosition)
-            //     {
-            //         lastPosition = currentPosition;
-            //         UpdatePlayerPositionRotation(currentPosition, currentRotation);
-            //     }
-            // }
+            if (playerData != null && playerHero != null && GameManager.Instance.isPlayingInMap)
+            {
+                Vector3 currentPosition = playerHero.transform.position;
+                Quaternion currentRotation = playerHero.transform.rotation;
+                if (currentPosition != lastPosition)
+                {
+                    lastPosition = currentPosition;
+                    UpdatePlayerPositionRotation(currentPosition, currentRotation);
+                }
+            }
         }
 
         private void UpdatePlayerPositionRotation(Vector3 position, Quaternion rotation)
@@ -66,37 +67,31 @@ namespace Systems.Hero.Manager
         private IEnumerator ActivatePlayerHeroWithDelay()
         {
             // Đợi 3 giây
-            yield return new WaitForSeconds(2f);
-
-            // // Đặt vị trí và xoay của playerHero
-            // Debug.Log($"PlayerDataManager: {playerData.position}");
-
-            // playerHero.transform.position = playerData.position;
-            // playerHero.transform.rotation = playerData.rotation;
-
-            // // Kích hoạt GameObject sau khi đã đặt vị trí và xoay
-            // if (playerHero != null)
-            // {
-            //     playerHero.SetActive(true);
-            // }
-            // Giả sử bạn đã load dữ liệu vào `playerData`
+            yield return new WaitForSeconds(1f);
+            if (playerHero == null)
+            {
+                playerHero = Instantiate(prefabPlayerHero, playerData.position, playerData.rotation);
+                Debug.Log($"PlayerHero: {playerHero != null}");
+            }
             if (playerData != null && playerHero != null)
             {
+                // Bật GameObject sau khi cập nhật vị trí
+                playerHero.SetActive(true);
+
                 // Cập nhật vị trí từ dữ liệu đã lưu
                 playerHero.transform.position = playerData.position;
                 playerHero.transform.rotation = playerData.rotation;
-
-                // Bật GameObject sau khi cập nhật vị trí
-                playerHero.SetActive(true);
             }
+            
         }
 
         private void OnLeaveGame(object[] obj)
         {
-            if (playerHero != null)
-            {
-                playerHero.SetActive(false); // Tắt Hero khi rời khỏi trò chơi
-            }
+            // if (playerHero != null)
+            // {
+            //     playerHero.SetActive(false); // Tắt Hero khi rời khỏi trò chơi
+            // }    
+            Destroy(playerHero);
         }
 
     }

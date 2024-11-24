@@ -19,8 +19,7 @@ public class GameManager : PersistentSingleton<GameManager>
     }
     private void Start()
     {
-        Debug.Log("Play");
-        PlayGame();
+
     }
     private void OnEnable()
     {
@@ -68,6 +67,7 @@ public class GameManager : PersistentSingleton<GameManager>
     }
     private void PlayGame()
     {
+        
         Observer.Instance.Notify("onPlayGame");
         isPlayingInMap = true;
         // Load Scene Map Hero Playing

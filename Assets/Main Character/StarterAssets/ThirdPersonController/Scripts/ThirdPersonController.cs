@@ -1,4 +1,5 @@
-﻿ using UnityEngine;
+﻿using Unity.Netcode;
+using UnityEngine;
 #if ENABLE_INPUT_SYSTEM 
 using UnityEngine.InputSystem;
 #endif
@@ -8,10 +9,19 @@ using UnityEngine.InputSystem;
 
 namespace StarterAssets
 {
-    [RequireComponent(typeof(CharacterController))]
+    [RequireComponent(typeof(CharacterController))] 
 #if ENABLE_INPUT_SYSTEM 
     [RequireComponent(typeof(PlayerInput))]
 #endif
+    // public class ThirdPersonController : NetworkBehaviour
+    // {
+	// 	public override void OnNetworkSpawn()
+	// 	{
+	// 		if (!IsOwner)
+	// 		{
+	// 			gameObject.SetActive(false);
+	// 		}
+	// 	}
     public class ThirdPersonController : MonoBehaviour
     {
         [Header("Player")]

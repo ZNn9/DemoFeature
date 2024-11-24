@@ -67,10 +67,6 @@ namespace Systems.SaveLoad.Manager
         }
         private async void OnApplicationQuit()
         {
-            PlayerDataManager.Instance.playerData.position = PlayerDataManager.Instance.playerHero.transform.position;
-            PlayerDataManager.Instance.playerData.rotation = PlayerDataManager.Instance.playerHero.transform.rotation;
-            saveLoadLocalService.trackableService.UpdateChange("playerData", true);
-            Debug.Log($"Save: {PlayerDataManager.Instance.playerData.position}");
             await SaveData();
         }
         private async void OnLogin(object[] obj)

@@ -79,7 +79,7 @@ namespace Systems.Account.Service
                 await anonymousService.SignInAnonymous();
                 return;
             }
-            if (SignInResult.AccountType == AccountType.Anonymous)
+            if (SignInResult.AccountType == AccountType.Player)
             {
                 Observer.Instance.Notify("onLoginAccount");
                 return;

@@ -10,6 +10,9 @@ using Unity.Services.Relay.Models;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
+using Unity.Services.Multiplay;
+using Systems.Hero.Manager;
+using Systems.Scriptable.Events;
 
 namespace Systems.Multiplayer.Manager
 {
@@ -17,7 +20,7 @@ namespace Systems.Multiplayer.Manager
     {
         [SerializeField] private TextMeshProUGUI joinCodeText;
         [SerializeField] private TMP_InputField joinCodeInputField;
-
+        private string joinCode;
         private void Start()
         {
             // await UnityServices.InitializeAsync();
@@ -28,10 +31,11 @@ namespace Systems.Multiplayer.Manager
         }
         public async void StartRelay()
         {
-
-            string joinCode = await StartHostWithRelay();
+            joinCode = await StartHostWithRelay();
+            // ...
+            PlayerDataManager.Instance.playerHero = GameObject.FindWithTag("Player");
             Debug.Log($"JoinCode: {joinCode}");
-            // joinCodeText.text = joinCode;
+            joinCodeText.text = joinCode;
         }
         public async void JoinRelay()
         {
@@ -41,10 +45,17 @@ namespace Systems.Multiplayer.Manager
                 return;
             }
             bool joined = await StartClientWithRelay(joinCodeInputField.text);
+            // PlayerDataManager.Instance.playerHero = GameObject.FindWithTag("Player");
             if (joined)
             {
                 joinCodeInputField.text = "";
             }
+        }
+
+        public void QuitHostTest()
+        {
+            QuitHost();
+            Observer.Instance.Notify("onLeaveGame");
         }
         private async Task<string> StartHostWithRelay(int maxConnections = 4)
         {
@@ -77,6 +88,11 @@ namespace Systems.Multiplayer.Manager
             JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode: joinCode);
             NetworkManager.Singleton.GetComponent<UnityTransport>().SetRelayServerData(new RelayServerData(joinAllocation, "dtls"));
             return !string.IsNullOrEmpty(joinCode) && NetworkManager.Singleton.StartClient();
+        }
+        private void QuitHost()
+        {
+            NetworkManager.Singleton.Shutdown();
+            Debug.Log("Host đã ngắt kết nối.");
         }
     }
 
